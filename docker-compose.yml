@@ -1,0 +1,207 @@
+services:
+  migrate:
+    build: 
+      context: .
+      dockerfile: migrations/Dockerfile
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_PORT=${DB_PORT}
+      - DB_SSL_MODE=${DB_SSL_MODE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no" 
+
+  cms:
+    build: 
+      context: .
+      dockerfile: cmd/cms/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - MINIO_ENDPOINT=minio:9000
+      - REDIS_ADDR=redis:6379
+      - OPENSEARCH_URL=http://opensearch:9200
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4318
+      - DB_HOST=postgres
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_PORT=${DB_PORT}
+      - DB_SSL_MODE=${DB_SSL_MODE}
+      - DB_POOL_MAX_CONNS=${DB_POOL_MAX_CONNS}
+      - MINIO_ACCESS_KEY_ID=${MINIO_ACCESS_KEY_ID}
+      - MINIO_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
+      - MINIO_USE_SSL=${MINIO_USE_SSL}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      - OTEL_ENABLED=${OTEL_ENABLED}
+      - OTEL_SERVICE_NAME=${OTEL_SERVICE_NAME}
+      - OTEL_SERVICE_VERSION=${OTEL_SERVICE_VERSION}
+      - OTEL_ENVIRONMENT=${OTEL_ENVIRONMENT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  indexer:
+    build:
+      context: .
+      dockerfile: cmd/workers/indexer/Dockerfile
+    environment:
+      - REDIS_ADDR=redis:6379
+      - OPENSEARCH_URL=http://opensearch:9200
+      - QUEUE_CONCURRENCY=5
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+
+  importer:
+    build:
+      context: .
+      dockerfile: cmd/workers/importer/Dockerfile
+    environment:
+      - REDIS_ADDR=redis:6379
+      - DB_HOST=postgres
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_PORT=${DB_PORT}
+      - DB_SSL_MODE=${DB_SSL_MODE}
+      - DB_POOL_MAX_CONNS=${DB_POOL_MAX_CONNS}
+      - QUEUE_CONCURRENCY=5
+    depends_on:
+      - postgres
+      - redis
+
+  discovery:
+    build:
+      context: .
+      dockerfile: cmd/discovery/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_HOST=postgres
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4318
+      - OPENSEARCH_URL=http://opensearch:9200
+      - OPENSEARCH_INDEX_PREFIX=th
+      - OTEL_ENABLED=${OTEL_ENABLED}
+      - OTEL_SERVICE_NAME=th-discovery
+      - OTEL_SERVICE_VERSION=${OTEL_SERVICE_VERSION}
+      - OTEL_ENVIRONMENT=${OTEL_ENVIRONMENT}
+      - HTTP_ADDR=:4000
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U th_test_user -d th_cms_test_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.1
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - "DISABLE_SECURITY_PLUGIN=true"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
+    ports:
+      - "5601:5601"
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
+    depends_on:
+      - opensearch
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_ACCESS_KEY}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.50
+    container_name: jaeger
+    ports:
+      - "16686:16686"    # jaeger ui
+      - "14268:14268"    # jaeger collector http
+      - "4317:4317"      # otlp grpc receiver
+      - "4318:4318"      # otlp http receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    command: [
+      "--log-level=debug"
+    ]
+
+volumes:
+  minio_data:
+  postgres_data:
+  redis_data:
+  opensearch_data:

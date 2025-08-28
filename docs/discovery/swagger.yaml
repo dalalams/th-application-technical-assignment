@@ -1,0 +1,129 @@
+basePath: /api/v1
+definitions:
+  th-application-technical-assignment_pkg_api_discovery_v1.SearchResponse:
+    properties:
+      page:
+        type: integer
+      page_count:
+        type: integer
+      page_size:
+        type: integer
+      query:
+        type: string
+      results:
+        items:
+          additionalProperties: {}
+          type: object
+        type: array
+      total:
+        type: integer
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Discovery API for searching and finding content
+  title: Discovery API
+  version: "1.0"
+paths:
+  /search/episodes:
+    get:
+      consumes:
+      - application/json
+      description: Search for episodes using full-text search
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Filter by series ID
+        in: query
+        name: series_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_discovery_v1.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search episodes
+      tags:
+      - Discovery
+  /search/series:
+    get:
+      consumes:
+      - application/json
+      description: Search for series using full-text search
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Filter by category ID
+        in: query
+        name: category_id
+        type: string
+      - description: Filter by series type
+        in: query
+        name: type
+        type: string
+      - description: Filter by language
+        in: query
+        name: language
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_discovery_v1.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search series
+      tags:
+      - Discovery
+schemes:
+- http
+- https
+swagger: "2.0"

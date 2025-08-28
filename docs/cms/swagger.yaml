@@ -1,0 +1,981 @@
+basePath: /api/v1
+definitions:
+  th-application-technical-assignment_pkg_api_cms_v1.CategoryResponse:
+    properties:
+      id:
+        type: string
+      slug:
+        type: string
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.ConfirmUploadRequest:
+    properties:
+      asset_type:
+        enum:
+        - audio
+        - video
+        - thumbnail
+        type: string
+      mime_type:
+        type: string
+      s3_key:
+        type: string
+      size:
+        minimum: 1
+        type: integer
+    required:
+    - asset_type
+    - mime_type
+    - s3_key
+    - size
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.CreateCategoryRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.CreateEpisodeRequest:
+    properties:
+      description:
+        maxLength: 2000
+        type: string
+      duration_seconds:
+        maximum: 86400
+        minimum: 0
+        type: integer
+      publish_date:
+        type: string
+      series_id:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - series_id
+    - title
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.CreateSeriesRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      language:
+        maxLength: 10
+        minLength: 2
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+      type:
+        enum:
+        - documentary
+        - podcast
+        type: string
+    required:
+    - category_id
+    - title
+    - type
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.EpisodeAssetResponse:
+    properties:
+      asset_type:
+        type: string
+      created_at:
+        type: string
+      episode_id:
+        type: string
+      id:
+        type: string
+      mime_type:
+        type: string
+      size_bytes:
+        type: integer
+      url:
+        type: string
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse:
+    properties:
+      assets:
+        items:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeAssetResponse'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      duration_seconds:
+        type: integer
+      id:
+        type: string
+      publish_date:
+        type: string
+      series_id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.ImportRequest:
+    properties:
+      series_id:
+        type: string
+      source_type:
+        enum:
+        - youtube
+        - spotify
+        - rss
+        - vimeo
+        type: string
+      source_url:
+        type: string
+    required:
+    - series_id
+    - source_type
+    - source_url
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.PaginatedCategoryResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CategoryResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/th-application-technical-assignment_pkg_util.PaginationMetadata'
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.PaginatedEpisodeResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/th-application-technical-assignment_pkg_util.PaginationMetadata'
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.PaginatedSeriesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.SeriesResponse'
+        type: array
+      pagination:
+        $ref: '#/definitions/th-application-technical-assignment_pkg_util.PaginationMetadata'
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.SeriesResponse:
+    properties:
+      category_id:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      language:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.UpdateCategoryRequest:
+    properties:
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.UpdateEpisodeRequest:
+    properties:
+      description:
+        maxLength: 2000
+        type: string
+      duration_seconds:
+        maximum: 86400
+        minimum: 0
+        type: integer
+      publish_date:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.UpdateSeriesRequest:
+    properties:
+      category_id:
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      language:
+        maxLength: 10
+        minLength: 2
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+      type:
+        enum:
+        - documentary
+        - podcast
+        type: string
+    required:
+    - title
+    - type
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.UploadURLRequest:
+    properties:
+      filename:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - filename
+    type: object
+  th-application-technical-assignment_pkg_api_cms_v1.UploadURLResponse:
+    properties:
+      expires_at:
+        type: string
+      s3_bucket:
+        type: string
+      s3_key:
+        type: string
+      upload_url:
+        type: string
+    type: object
+  th-application-technical-assignment_pkg_util.PaginationMetadata:
+    properties:
+      item_count:
+        type: integer
+      page:
+        type: integer
+      page_count:
+        type: integer
+      page_size:
+        type: integer
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Content Management System API for managing series, episodes, and categories
+  title: CMS API
+  version: "1.0"
+paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all categories available in the system
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.PaginatedCategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all categories with pagination
+      tags:
+      - Categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category with the provided data
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new category
+      tags:
+      - Categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete category by ID
+      tags:
+      - Categories
+    get:
+      consumes:
+      - application/json
+      description: Get a single category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get category by ID
+      tags:
+      - Categories
+    put:
+      consumes:
+      - application/json
+      description: Update an existing category with the provided data
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update category by ID
+      tags:
+      - Categories
+  /import:
+    post:
+      consumes:
+      - application/json
+      description: Import content from YouTube, and other sources
+      parameters:
+      - description: Import request data
+        in: body
+        name: import
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.ImportRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import content from external source
+      tags:
+      - Import
+  /series:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all series available in the system
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.PaginatedSeriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all series with pagination
+      tags:
+      - Series
+    post:
+      consumes:
+      - application/json
+      description: Create a new series with the provided data
+      parameters:
+      - description: Series data
+        in: body
+        name: series
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CreateSeriesRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.SeriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new series
+      tags:
+      - Series
+  /series/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a series by its ID
+      parameters:
+      - description: Series ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete series by ID
+      tags:
+      - Series
+    get:
+      consumes:
+      - application/json
+      description: Get a single series by its ID
+      parameters:
+      - description: Series ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.SeriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get series by ID
+      tags:
+      - Series
+    put:
+      consumes:
+      - application/json
+      description: Update an existing series with the provided data
+      parameters:
+      - description: Series ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Series data
+        in: body
+        name: series
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.UpdateSeriesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.SeriesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update series by ID
+      tags:
+      - Series
+  /series/episodes:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all episodes for a specific series
+      parameters:
+      - description: Series ID
+        in: query
+        name: series_id
+        required: true
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.PaginatedEpisodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List episodes by series with pagination
+      tags:
+      - Episodes
+    post:
+      consumes:
+      - application/json
+      description: Create a new episode for a series
+      parameters:
+      - description: Episode data
+        in: body
+        name: episode
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.CreateEpisodeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new episode
+      tags:
+      - Episodes
+  /series/episodes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an episode by its ID
+      parameters:
+      - description: Episode ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete episode by ID
+      tags:
+      - Episodes
+    get:
+      consumes:
+      - application/json
+      description: Get a single episode by its ID
+      parameters:
+      - description: Episode ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get episode by ID
+      tags:
+      - Episodes
+    put:
+      consumes:
+      - application/json
+      description: Update an existing episode with the provided data
+      parameters:
+      - description: Episode ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Episode data
+        in: body
+        name: episode
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.UpdateEpisodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update episode by ID
+      tags:
+      - Episodes
+  /series/episodes/{id}/upload-confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm that the file was successfully uploaded and update episode
+        metadata
+      parameters:
+      - description: Episode ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Upload confirmation details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.ConfirmUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.EpisodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Confirm episode file upload
+      tags:
+      - Episodes
+  /series/episodes/{id}/upload-url:
+    post:
+      description: Validates the episode ID and returns a temporary URL for the client
+        to upload a file directly to S3.
+      parameters:
+      - description: Episode ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Upload request details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.UploadURLRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully generated the pre-signed URL
+          schema:
+            $ref: '#/definitions/th-application-technical-assignment_pkg_api_cms_v1.UploadURLResponse'
+        "400":
+          description: Bad Request (e.g., invalid ID, missing filename)
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Episode not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a pre-signed URL for an episode media upload
+      tags:
+      - Episodes
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT Bearer token for authentication. Example: "Bearer <token>"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
